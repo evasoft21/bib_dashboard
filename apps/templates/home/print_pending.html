@@ -1,0 +1,247 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Tables {% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+  <div class="container-fluid py-4">
+    <div class="row">
+      <div class="col-12">
+        <div class="card my-4">
+          <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+            <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
+              <h6 class="text-white text-capitalize ps-3">All Order In Quee</h6>
+            </div>
+          </div>
+          <div class="card-body px-0 pb-2">
+            <div class="table-responsive p-0">
+              <table class="table align-items-center mb-0">
+                <thead>
+                  <tr>
+                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Name</th>
+                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">number Page</th>
+                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Status</th>
+
+                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Printer</th>
+
+
+                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Tray</th>
+
+                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Odd/Even</th>
+
+                    <!-- <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Pages</th> -->
+
+                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Pages</th>
+
+
+                    <!-- <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Date</th> -->
+
+
+                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Ticket</th>
+                  </tr>
+                </thead>
+                <tbody>
+
+{% for item in data %}
+
+
+
+<tr>
+  <td>
+    <div class="d-flex px-2 py-1">
+
+      <div class="d-flex flex-column justify-content-center">
+        <h6 class="mb-0 text-sm">{{item["billing"]["first_name"]}}</h6>
+      </div>
+    </div>
+  </td>
+  <td>
+    <p class="text-xs font-weight-bold mb-0">{{item["total"]}}</p>
+  </td>
+  <td class="align-middle text-center text-sm">
+    <span class="badge badge-sm bg-gradient-success">{{item["billing"]["company"]}}</span>
+  </td>
+
+  <td class="align-middle text-center text-sm">
+
+    <select  name="printer">
+      <option value="48">48</option>
+      <option value="49">49</option>
+      <option value="54">54</option>
+      <option value="49">56</option>
+    </select>
+
+  </td>
+
+
+  <td class="align-middle text-center text-sm">
+
+    <div class="form-check">
+      <input class="form-check-input" type="radio" name="Tray{{item['id']}}" >
+      <label class="form-check-label" for="Tray{{item['id']}}">
+        Duplex
+      </label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="radio" name="Tray{{item['id']}}" checked>
+      <label class="form-check-label" for="Tray{{item['id']}}">
+        Front
+      </label>
+    </div>
+    <!-- <div class="form-check">
+      <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault2" checked>
+      <label class="form-check-label" for="flexRadioDefault2">
+        Rear
+      </label>
+    </div> -->
+
+ 
+
+  </td>
+
+  <td class="align-middle text-center text-sm">
+
+    <div class="form-check">
+      <input class="form-check-input" type="radio" name="OddEven{{item['id']}}" >
+      <label class="form-check-label" for="OddEven{{item['id']}}">
+        Even
+      </label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="radio" name="OddEven{{item['id']}}"  checked>
+      <label class="form-check-label" for="OddEven{{item['id']}}">
+        Odd
+      </label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="radio" name="OddEven{{item['id']}}"  checked>
+      <label class="form-check-label" for="OddEven{{item['id']}}">
+        All
+      </label>
+    </div>
+
+ 
+
+  </td>
+
+
+  <td class="align-middle text-center text-sm">
+    <input type="text" name="Pages{{item['id']}}"  aria-label="Small" aria-describedby="inputGroup-sizing-sm">
+    
+  </td>
+  
+
+
+  <td class="align-middle">
+    <!-- {{item["customer_id"]}}
+    {{current_user_id}} -->
+<!-- {{item["customer_id"] == current_user_id}} -->
+    {% if item["customer_id"] == current_user_id %}
+    <!-- <form action="/activate_print_pending" method="post" class="form-example">
+      <input hidden type="text" value="print" name="action"  required>
+      <input hidden type="text" value='{{item["id"]}}' name="id"  required>
+      <input type="submit" value="Print">
+  </form> -->
+
+  <button type="button" onclick="send_to_printer('{{item['id']}}')" >
+    Print
+  </button>
+
+  <form action="/activate_print_pending" method="post" class="form-example">
+    <input hidden type="text" value="roll" name="action"  required>
+    <input hidden type="text" value='{{item["id"]}}' name="id"  required>
+    <input type="submit" value="Undo">
+</form>
+
+<form action="/activate_print_pending" method="post" class="form-example">
+  <input hidden type="text" value="complete" name="action"  required>
+  <input hidden type="text" value='{{item["id"]}}' name="id"  required>
+  <input type="submit" value="Complete">
+</form>
+
+    {% else %}
+
+    <form action="/activate_print_pending" method="post" class="form-example">
+        <input hidden type="text" value="approve" name="action"  required>
+        <input hidden type="text" value='{{item["id"]}}' name="id"  required>
+
+        <input type="submit" value="Activate">
+    </form>
+
+    {% endif %}
+
+<!-- 
+    <form action="/action_pending" method="post" class="form-example">
+      <input hidden type="text" value="unpaidprocessing" name="action"  required>
+      <input hidden type="text" value='{{item["id"]}}' name="id"  required>
+
+      <input type="submit" value="Approve Unpaid">
+  </form> -->
+
+    <!-- <form action="/action_pending" method="post" class="form-example">
+      <input hidden type="text" value="delete" name="action"  required>
+      <input hidden type="text" value='{{item["id"]}}' name="id"  required>
+
+      <input type="submit" value="Delete">
+  </form> -->
+
+  </td>
+</tr>
+
+
+
+
+   {% endfor %}
+
+
+           
+         
+             
+             
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+ 
+  </div>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+
+<script>
+  function send_to_printer(order_id) {
+    let  data = new FormData();
+data.append('user', 'person');
+data.append('pwd', 'password');
+data.append('organization', 'place');
+data.append('requiredkey', 'key');
+
+var xhr = new XMLHttpRequest();
+xhr.open('POST', 'somewhere', true);
+xhr.onload = function () {
+    // do something to response
+    console.log(this.responseText);
+};
+xhr.send(data);
+
+
+    document.getElementById("demo").style.color = "red";
+  }
+
+
+
+
+
+  </script>
+
+
+{% endblock javascripts %}
