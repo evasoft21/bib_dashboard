@@ -205,19 +205,7 @@ def print_pending():
         item["customer_id"]=str(item["customer_id"])
         item["total"]=int(item["total"].split(".")[0])/4
 
-    
-
-
-
-    # return current_user.get_id()
-    # user_id = session["user_id"]
-    # user= str(current_user)
-
-    # data=orders.all()
-    # data=json.loads(response.text)
-
-    # return(response.text)
-
+  
     user_id=-1
     user_role=""
     for user in user_list:
@@ -261,8 +249,6 @@ def activate_print_pending():
 
     user_list=wcapi.get("customers",params=params)
 
-    # url="http://127.0.0.1/wordpress/wp-json/wp/v2/users"
-    # user_list=wc_oauth.get(url)
 
     user_list=json.loads(user_list.text)
 
@@ -281,54 +267,12 @@ def activate_print_pending():
     response=wcapi.put(url,params)
 
 
-
-    # return str(user_list.text)
-
-    # return response.text
-    # order_id=str(request.form["id"])
-
- 
-    
-    # params = {'status': 'pending'}
-
-    # if(request.form["action"]=="approve"):
-    #     params = {'status': 'processing',
-    #                 "billing":{
-    #                     "company":"processing"
-    #                 }
-    #                 }
-    # elif(request.form["action"]=="delete"):
-    #     params = {'status': 'cancelled'}
-    # elif (request.form["action"]=="unpaidprocessing"):
-    #     params = {'status': 'unpaidprocessing',
-        
-    #                 "billing":{
-    #                     "company":"processing"
-    #                 }
-
-    #                 }
-
-    
-    # url=f'orders/{order_id}'
-    # response=wcapi.put(url,params)
-
-    # return response.text
     if(response.status_code==200):
         pass
 
     return redirect('/print_pending')
 
-    # # return current_user.get_id()
-    # # user_id = session["user_id"]
-    # # user= str(current_user)
 
-    # # data=orders.all()
-    # data=json.loads(response.text)
-    # for item in data:
-    #     item["total"]=int(item["total"].split(".")[0])
-    
-
-    return render_template('home/tables_all.html',weekend=current_user,data=data,segment='index')
 
 
 @blueprint.route('/print_action',methods=['POST'])
@@ -381,54 +325,68 @@ def print_action():
     response=wcapi.put(url,params)
 
 
-
-    # return str(user_list.text)
-
-    # return response.text
-    # order_id=str(request.form["id"])
-
- 
-    
-    # params = {'status': 'pending'}
-
-    # if(request.form["action"]=="approve"):
-    #     params = {'status': 'processing',
-    #                 "billing":{
-    #                     "company":"processing"
-    #                 }
-    #                 }
-    # elif(request.form["action"]=="delete"):
-    #     params = {'status': 'cancelled'}
-    # elif (request.form["action"]=="unpaidprocessing"):
-    #     params = {'status': 'unpaidprocessing',
-        
-    #                 "billing":{
-    #                     "company":"processing"
-    #                 }
-
-    #                 }
-
-    
-    # url=f'orders/{order_id}'
-    # response=wcapi.put(url,params)
-
-    # return response.text
     if(response.status_code==200):
         pass
 
     return redirect('/print_pending')
 
-    # # return current_user.get_id()
-    # # user_id = session["user_id"]
-    # # user= str(current_user)
 
-    # # data=orders.all()
+
+
+@blueprint.route('/coures')
+@login_required
+def coures():
+
+    
+    params = {'role': "all"}
+
+    user_list=wcapi.get("customers",params=params)
+
+
+    user_list=json.loads(user_list.text)
+
+    user_id=-1
+    for user in user_list:
+        if (user["username"]==str(current_user)):
+            user_id=user["id"]
+            break
+
+    data_=[["processing",0],["processing",user_id],["unpaidprocessing",0],["unpaidprocessing",user_id]]
+    
+    data=[]
+
+    for dd in data_:
+        params = {'status': dd[0] , "customer_id":dd[1]}
+
+        response=wcapi.get("orders",params=params)
+        # return str(response.text)
+        for item in json.loads(response.text):
+            if(item["customer_id"]==dd[1]):
+                data.append(item)
+
+
     # data=json.loads(response.text)
-    # for item in data:
-    #     item["total"]=int(item["total"].split(".")[0])
+
+    # params = {'status': "unpaidprocessing"}
+
+    # response=wcapi.get("orders",params=params)
+
+    for item in data:
+        item["customer_id"]=str(item["customer_id"])
+        item["total"]=int(item["total"].split(".")[0])/4
+
+  
+    user_id=-1
+    user_role=""
+    for user in user_list:
+        if (user["username"]==str(current_user)):
+            user_id=user["id"]
+            user_role=user["role"]
+            break
+
     
 
-    return render_template('home/tables_all.html',weekend=current_user,data=data,segment='index')
+    return render_template('home/coures.html',user_role=user_role,current_user=current_user,current_user_id=str(user_id),data=data,segment='coures')
 
 
 
