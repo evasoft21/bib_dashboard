@@ -222,6 +222,7 @@ def print_pending():
 @blueprint.route('/activate_print_pending',methods=['POST'])
 @login_required
 def activate_print_pending():
+    return str(request.form)
 
     order_id=str(request.form["id"])
 
