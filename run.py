@@ -10,6 +10,11 @@ from decouple import config
 from apps.config import config_dict
 from apps import create_app, db
 
+
+
+UPLOAD_FOLDER = './uploads'
+ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
+
 # WARNING: Don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=True, cast=bool)
 

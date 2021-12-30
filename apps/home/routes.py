@@ -12,6 +12,15 @@ from flask_login import (
 from jinja2 import TemplateNotFound
 from apps import orders , wcapi,wc_oauth
 import json
+import os
+
+UPLOAD_FOLDER = './uploads'
+ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
+
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 @blueprint.route('/index')
 @login_required
@@ -207,7 +216,7 @@ def print_pending():
 
   
     user_id=-1
-    user_role=""
+    user_role="bb"
     for user in user_list:
         if (user["username"]==str(current_user)):
             user_id=user["id"]
@@ -222,7 +231,7 @@ def print_pending():
 @blueprint.route('/activate_print_pending',methods=['POST'])
 @login_required
 def activate_print_pending():
-    return str(request.form)
+    return str(request.files['file'])
 
     order_id=str(request.form["id"])
 
@@ -337,7 +346,7 @@ def print_action():
 @blueprint.route('/coures')
 @login_required
 def coures():
-
+    # return str(login_user)
     
     params = {'role': "all"}
 
@@ -347,48 +356,84 @@ def coures():
     user_list=json.loads(user_list.text)
 
     user_id=-1
-    for user in user_list:
-        if (user["username"]==str(current_user)):
-            user_id=user["id"]
-            break
-
-    data_=[["processing",0],["processing",user_id],["unpaidprocessing",0],["unpaidprocessing",user_id]]
-    
-    data=[]
-
-    for dd in data_:
-        params = {'status': dd[0] , "customer_id":dd[1]}
-
-        response=wcapi.get("orders",params=params)
-        # return str(response.text)
-        for item in json.loads(response.text):
-            if(item["customer_id"]==dd[1]):
-                data.append(item)
-
-
-    # data=json.loads(response.text)
-
-    # params = {'status': "unpaidprocessing"}
-
-    # response=wcapi.get("orders",params=params)
-
-    for item in data:
-        item["customer_id"]=str(item["customer_id"])
-        item["total"]=int(item["total"].split(".")[0])/4
-
-  
-    user_id=-1
     user_role=""
+
     for user in user_list:
         if (user["username"]==str(current_user)):
             user_id=user["id"]
-            user_role=user["role"]
             break
+
+    category=wcapi.get("products/categories")
+
+    categories=json.loads(category.text)
+
 
     
 
-    return render_template('home/coures.html',user_role=user_role,current_user=current_user,current_user_id=str(user_id),data=data,segment='coures')
+    return render_template('home/coures.html',user_role=user_role,categories=categories,current_user=current_user,current_user_id=str(user_id),segment='coures')
 
+# @blueprint.route('/coures_upload_action', methods = [ 'POST'])
+# def upload_file():
+#    if request.method == 'POST':
+#       f = request.files['file']
+#       f.save(f.filename)
+#       return 'file uploaded successfully'
+
+
+@blueprint.route('/coures_upload_action',methods=['POST'])
+@login_required
+def coures_upload_action():
+    if request.method == 'POST':
+        f = request.files['file']
+        # f.save(f.filename)
+
+        f.save(os.path.join("uploads", f.filename))
+        return 'file uploaded successfully'
+#     # return str(request.files['file'])
+
+#     f = request.files['file']
+#     f.save(secure_filename(f.filename))
+#     return 'file uploaded successfully'
+
+#     file=request.files["file"]
+#     if file and allowed_file(file.filename):
+#         filename = secure_filename(file.filename)
+#         file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+#         # return redirect(url_for('download_file', name=filename))
+
+#     return "str(request.form)"
+#     order_id=str(request.form["id"])
+
+
+
+#     params = {'role': "all"}
+
+#     user_list=wcapi.get("customers",params=params)
+
+#     # url="http://127.0.0.1/wordpress/wp-json/wp/v2/users"
+#     # user_list=wc_oauth.get(url)
+
+#     user_list=json.loads(user_list.text)
+
+#     user_id=0
+#     for user in user_list:
+#         if (user["username"]==str(current_user)):
+#             user_id=user["id"]
+#             break
+
+    
+#     order_id=str(request.form["id"])
+
+#     params = {'customer_id': user_id}
+
+#     url=f'orders/{order_id}'
+#     response=wcapi.put(url,params)
+
+
+#     if(response.status_code==200):
+#         pass
+
+#     return redirect('/print_pending')
 
 
 
